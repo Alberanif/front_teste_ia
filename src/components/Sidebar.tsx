@@ -2,19 +2,28 @@ import React from 'react';
 import { Conversation } from '@/lib/api';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Plus } from 'lucide-react';
 
 interface SidebarProps {
   conversations: Conversation[];
   activeConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
+  onNewConversation?: () => void;
 }
 
-export function Sidebar({ conversations, activeConversation, onSelectConversation }: SidebarProps) {
+export function Sidebar({ conversations, activeConversation, onSelectConversation, onNewConversation }: SidebarProps) {
   return (
     <div className="w-1/3 bg-white border-r border-gray-300 flex flex-col h-full">
       {/* Header */}
       <div className="bg-gray-100 p-4 border-b border-gray-300 flex justify-between items-center shadow-sm">
         <h2 className="text-xl font-semibold text-gray-800">Conversas</h2>
+        <button
+          onClick={onNewConversation}
+          className="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors flex items-center justify-center"
+          title="Nova Conversa"
+        >
+          <Plus size={20} />
+        </button>
       </div>
 
       {/* List */}

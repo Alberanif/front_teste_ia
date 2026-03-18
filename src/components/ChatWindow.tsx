@@ -91,7 +91,7 @@ export function ChatWindow({ conversation, messages, onMessageSent }: ChatWindow
         <form onSubmit={handleSend} className="flex gap-2">
           <input
             type="text"
-            className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:outline-none focus:border-green-500 shadow-sm"
+            className="flex-1 rounded-full border border-gray-300 px-4 py-2 text-gray-900 focus:outline-none focus:border-green-500 shadow-sm"
             placeholder="Digite uma mensagem..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
