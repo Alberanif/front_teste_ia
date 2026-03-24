@@ -25,29 +25,37 @@ export function ChatWindow({ conversation, messages, onMessageSent }: ChatWindow
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    const text = inputText.trim();
+    if (!text) return;
 
+    // Add user message immediately to state (optimistic update)
+    const userMessage: Message = {
+      id: Date.now(),
+      conversation_id: conversation.id,
+      mensagem: text,
+      sender: 'user',
+      created_at: new Date().toISOString(),
+    };
+    onMessageSent(userMessage);
+    setInputText('');
     setIsSending(true);
-    const success = await sendMessageWebhook(
-      inputText.trim(),
-      conversation.numero_conversa,
-      conversation.nome_usuario
-    );
 
-    if (success) {
-      // Optimistically add message
-      const optimisicMessage: Message = {
-        id: Date.now(),
-        conversation_id: conversation.id,
-        mensagem: inputText.trim(),
-        sender: 'user',
-        created_at: new Date().toISOString(),
-      };
-      onMessageSent(optimisicMessage);
-      setInputText('');
-    } else {
+    const result = await sendMessageWebhook(text, conversation.numero_conversa, conversation.nome_usuario);
+
+    if (!result.success) {
       alert('Falha ao enviar mensagem. Tente novamente.');
+    } else if (result.botMessage) {
+      // Add bot response directly from API — no need to wait for real-time
+      const botMsg: Message = {
+        id: result.botMessage.id,
+        conversation_id: conversation.id,
+        mensagem: result.botMessage.mensagem,
+        sender: 'bot',
+        created_at: result.botMessage.created_at,
+      };
+      onMessageSent(botMsg);
     }
+
     setIsSending(false);
   };
 

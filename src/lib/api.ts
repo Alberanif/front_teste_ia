@@ -71,12 +71,18 @@ export async function fetchMessages(conversationId: string) {
     id: d.id,
     conversation_id: d.id_atendimento,
     mensagem: d.texto_da_mensagem,
-    sender: 'user',
+    sender: d.remetente === 'bot' ? 'bot' : 'user',
     created_at: d.criada_em
   })) as Message[];
 }
 
-export async function sendMessageWebhook(mensagem: string, numero_conversa: string, nome_usuario: string) {
+export interface BotMessage {
+  id: number;
+  mensagem: string;
+  created_at: string;
+}
+
+export async function sendMessageWebhook(mensagem: string, numero_conversa: string, nome_usuario: string): Promise<{ success: boolean; botMessage?: BotMessage }> {
   try {
     const response = await fetch('/api/send-message', {
       method: 'POST',
@@ -89,9 +95,13 @@ export async function sendMessageWebhook(mensagem: string, numero_conversa: stri
         "nome do usuario": nome_usuario,
       }),
     });
-    return response.ok;
+
+    if (!response.ok) return { success: false };
+
+    const data = await response.json();
+    return { success: true, botMessage: data.botMessage ?? undefined };
   } catch (error) {
     console.error('Error sending message:', error);
-    return false;
+    return { success: false };
   }
 }

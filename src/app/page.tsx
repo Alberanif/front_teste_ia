@@ -41,11 +41,15 @@ export default function App() {
           id: rawMsg.id,
           conversation_id: rawMsg.id_atendimento,
           mensagem: rawMsg.texto_da_mensagem,
-          sender: 'user',
+          sender: rawMsg.remetente === 'bot' ? 'bot' : 'user',
           created_at: rawMsg.criada_em
         };
         if (activeConversation && newMessage.conversation_id === activeConversation.id) {
-          setMessages((prev) => [...prev, newMessage]);
+          setMessages((prev) => {
+            // Prevent duplicates when message was already added via API response
+            if (prev.some((m) => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
         }
       })
       .subscribe();
